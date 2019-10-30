@@ -77,8 +77,12 @@ then(results => {
 
     storage.setUpAPIEndpoints((notify: string[]) => {});
 
-    makeEndpoint<Concept[]>('search-concepts', async ({ query }: { query?: string }) => {
-      return Object.values((await storage.findObjects(query)).concepts);
+    makeEndpoint<{ items: Concept[], total: number }>('search-concepts', async ({ query }: { query?: string }) => {
+      const items = Object.values((await storage.findObjects(query)).concepts);
+      return {
+        items: items.slice(0, 20),
+        total: items.length,
+      };
     });
 
     makeEndpoint<Concept>('concept', async ({ id }: { id: string }) => {

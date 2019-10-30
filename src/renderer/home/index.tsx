@@ -15,16 +15,18 @@ import styles from './styles.scss';
 
 export const Home: React.FC<{}> = function () {
   const [concepts, updateConcepts] = useState([] as Concept[]);
+  const [total, updateTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState(undefined as undefined | string);
 
   async function reloadConcepts() {
     setLoading(true);
-    const concepts = await apiRequest<Concept[]>(
+    const result = await apiRequest<{ items: Concept[], total: number }>(
       'search-concepts',
       JSON.stringify({ query: query }));
     setLoading(false);
-    updateConcepts(concepts);
+    updateConcepts(result.items);
+    updateTotal(result.total);
   }
 
   const reloadThrottled = debounce(500, reloadConcepts);
@@ -66,9 +68,14 @@ export const Home: React.FC<{}> = function () {
 
       <div className={styles.conceptCollection}>
         {concepts.length > 0
-          ? concepts.map((concept) => (
-              <ConceptItem concept={concept} />
-            ))
+          ? <>
+              {concepts.map((concept) => (
+                <ConceptItem concept={concept} />
+              ))}
+              <div className={styles.conceptCollectionTotal}>
+                <p>Showing {concepts.length} out of {total} result(s) found</p>
+              </div>
+            </>
           : <NonIdealState
               title="Nothing to display"
               icon="zoom-out" />}

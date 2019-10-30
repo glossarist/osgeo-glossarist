@@ -17,6 +17,13 @@
   flex: 1;
   overflow-y: auto;
   padding: 0 .2rem;
+  padding-top: .5rem;
+}
+
+:local .conceptCollectionTotal {
+  color: $pt-text-color-muted;
+  margin-top: .5rem;
+  padding: 0 1rem;
 }
 
 :local .conceptItem {
