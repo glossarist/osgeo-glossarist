@@ -36,10 +36,6 @@ export class ConceptManager extends StoreManager<Concept> {
   }
 
   public objectMatchesQuery(obj: Concept, query: string) {
-    if (obj.id === 32) {
-      console.debug(query.trim().toLowerCase(), obj.term.trim().toLowerCase());
-      console.debug(obj.term.trim().toLowerCase().indexOf(query.trim().toLowerCase()) >= 0);
-    }
     return obj.term.trim().toLowerCase().indexOf(query.trim().toLowerCase()) >= 0;
   }
 }
