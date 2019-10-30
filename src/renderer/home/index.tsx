@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 
 import React, { useState, useEffect, useContext } from 'react';
 
-import { NonIdealState, Spinner, Icon, InputGroup } from '@blueprintjs/core';
+import { NonIdealState, Button, Spinner, Icon, InputGroup } from '@blueprintjs/core';
 
 import { LangConfigContext } from 'sse/localizer/renderer';
 import { PaneHeader } from 'sse/renderer/widgets/pane-header';
@@ -67,7 +67,7 @@ export const Home: React.FC<{}> = function () {
         />
       </div>
 
-      <div className={styles.conceptCollection}>
+      <main className={styles.conceptCollection}>
         {concepts.length > 0
           ? <>
               {concepts.map((concept) => (
@@ -80,7 +80,16 @@ export const Home: React.FC<{}> = function () {
           : <NonIdealState
               title="Nothing to display"
               icon="zoom-out" />}
-      </div>
+      </main>
+
+      <footer className={styles.actions}>
+        <Button
+          large={true}
+          intent="success"
+          fill={true}
+          onClick={() => ipcRenderer.sendSync('open-data-synchronizer')}
+          icon="git-merge">Merge changes</Button>
+      </footer>
     </div>
   );
 };

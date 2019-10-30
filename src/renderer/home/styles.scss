@@ -76,3 +76,10 @@
     }
   }
 }
+
+:local .actions {
+  > :first-child {
+    border-radius: 0;
+    box-shadow: none !important;
+  }
+}
