@@ -14,6 +14,7 @@ import styles from './styles.scss';
 export const Concept: React.FC<{ id: string }> = function ({ id }) {
   const [concept, updateConcept] = useState(undefined as ConceptModel | undefined);
   const [loading, setLoading] = useState(true);
+  const [dirty, setDirty] = useState(false);
 
   const [term, updateTerm] = useState('');
   const [definition, updateDefinition] = useState('');
@@ -30,6 +31,8 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
 
   async function handleSaveClick() {
     if (concept) {
+      setLoading(true);
+
       const newConcept = {
         ...concept,
         [lang.selected]: {
@@ -45,6 +48,9 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
       }
 
       await apiRequest<void>('concept', JSON.stringify({ id: id }), JSON.stringify({ newData: newConcept }));
+
+      setDirty(false);
+      setLoading(false);
     }
   }
 
@@ -68,7 +74,7 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
         <EditableText
           placeholder="Edit term…"
           intent={term.trim() === '' ? "danger" : undefined}
-          onChange={updateTerm}
+          onChange={(val: string) => { setDirty(true); updateTerm(val) }}
           value={term} />
       </H2>
 
@@ -76,7 +82,7 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
         <EditableText
           placeholder="Edit authoritative source…"
           intent={authSource.trim() === '' ? "danger" : undefined}
-          onChange={updateAuthSource}
+          onChange={(val: string) => { setDirty(true); updateAuthSource(val); }}
           value={authSource}/>
         <Tooltip content="Open authoritative source in a new window">
           <Button
@@ -92,13 +98,13 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
           placeholder="Edit definition…"
           intent={definition.trim() === '' ? "danger" : undefined}
           multiline={true}
-          onChange={updateDefinition}
+          onChange={(val: string) => { setDirty(true); updateDefinition(val); }}
           value={definition}/>
       </div>
 
       <footer className={styles.actions}>
         <Button
-          disabled={loading}
+          disabled={loading || !dirty}
           large={true}
           minimal={false}
           intent="primary"
