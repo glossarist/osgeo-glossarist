@@ -15,6 +15,9 @@
       "webpackConfig": "renderer.webpack.js"
     }
   },
+  "build": {
+    "productName": "OSGeo Glossarist"
+  },
   "scripts": {
     "dev": "electron-webpack dev",
     "compile": "electron-webpack",
