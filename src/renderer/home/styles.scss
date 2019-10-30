@@ -1,0 +1,57 @@
+@import "~@blueprintjs/core/lib/scss/variables";
+
+:local .homeBase {
+  height: 100vh;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+:local .searchControls {
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+:local .queryLoading {
+  background: whiteSmoke;
+}
+
+:local .conceptCollection {
+  flex: 1;
+  overflow-y: auto;
+}
+
+:local .conceptItem {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 0 1rem;
+
+  :local .title {
+    flex: 1;
+    font-weight: bold;
+    a {
+      color: inherit;
+    }
+  }
+
+  :local .icons {
+    > * {
+      transform: scale(0.8);
+      opacity: 0.2;
+      &.activeIcon {
+        opacity: 1;
+      }
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    :local .title a {
+      text-decoration: underline;
+      color: $pt-link-color;
+    }
+  }
+}
