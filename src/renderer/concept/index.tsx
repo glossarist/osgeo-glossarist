@@ -62,7 +62,6 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
 
   return (
     <div className={styles.conceptBase}>
-
       <PaneHeader align="right">Concept&nbsp;<Tooltip content="Concept IDs are set internally and cannot be changed"><span className={styles.conceptIdHighlight}>{id}</span></Tooltip></PaneHeader>
 
       <H2 className={styles.conceptHeader}>
@@ -106,7 +105,6 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
           onClick={handleSaveClick}
           icon="floppy-disk">Save</Button>
       </footer>
-
     </div>
   );
 };
