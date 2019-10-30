@@ -81,6 +81,13 @@ then(results => {
       return Object.values((await storage.findObjects(query)).concepts);
     });
 
+    makeEndpoint<Concept>('concept', async ({ id }: { id: string }) => {
+      return storage.workspace.concepts[id] as Concept;
+    }, async ({ newData }) => {
+      storage.workspace.concepts[newData.id] = newData;
+      await storage.storeWorkspace();
+    });
+
     makeWindowEndpoint('concept', (id: string) => ({
       component: 'concept',
       title: `Concept ${id}`,
