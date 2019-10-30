@@ -1,2 +1,3 @@
-# osgeo-glossarist
-Frontend for managing OSGeo glossary
+# OSGeo Glossarist
+
+A cross-platform app for managing OSGeo Glossary.
