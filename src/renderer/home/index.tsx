@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 
 import React, { useState, useEffect, useContext } from 'react';
 
-import { NonIdealState, Icon, InputGroup } from '@blueprintjs/core';
+import { NonIdealState, Spinner, Icon, InputGroup } from '@blueprintjs/core';
 
 import { LangConfigContext } from 'sse/localizer/renderer';
 import { PaneHeader } from 'sse/renderer/widgets/pane-header';
@@ -41,16 +41,18 @@ export const Home: React.FC<{}> = function () {
     reloadThrottled();
   }, [query]);
 
+  const maybeSpinner = loading ? <Spinner size={Icon.SIZE_STANDARD} /> : undefined;
+
   return (
     <div className={styles.homeBase}>
       <PaneHeader align="right">OSGeo Concepts</PaneHeader>
 
       <div className={styles.searchControls}>
         <InputGroup
-          placeholder="Search"
+          placeholder="Type to search…"
+          rightElement={maybeSpinner}
           value={query || ''}
           type="text"
-          className={loading ? styles.queryLoading : undefined}
           onChange={(evt: React.FormEvent<HTMLElement>) => {
             const newQuery = (evt.target as HTMLInputElement).value as string;
             if (newQuery.trim() !== '') {
@@ -82,6 +84,7 @@ const ConceptItem: React.FC<{ concept: Concept }> = function ({ concept }) {
 
   const hasComments = (localized.comments || []).length > 0;
   const hasNotes = (localized.notes || []).length > 0;
+  const hasExamples = (localized.examples || []).length > 0;
 
   return (
     <li className={styles.conceptItem} onClick={() => ipcRenderer.sendSync('open-concept', `${concept.id}`)}>
@@ -97,6 +100,10 @@ const ConceptItem: React.FC<{ concept: Concept }> = function ({ concept }) {
           htmlTitle="Has notes"
           className={hasNotes ? styles.activeIcon : undefined}
           intent={hasNotes ? "primary" : undefined} />
+        <Icon icon="citation"
+          htmlTitle="Has examples"
+          className={hasExamples ? styles.activeIcon : undefined}
+          intent={hasExamples ? "primary" : undefined} />
       </div>
     </li>
   );

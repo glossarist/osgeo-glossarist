@@ -13,13 +13,10 @@
   flex-shrink: 0;
 }
 
-:local .queryLoading {
-  background: whiteSmoke;
-}
-
 :local .conceptCollection {
   flex: 1;
   overflow-y: auto;
+  padding: 0 .2rem;
 }
 
 :local .conceptItem {
@@ -40,6 +37,8 @@
     > * {
       transform: scale(0.8);
       opacity: 0.2;
+      margin-left: .25rem;
+
       &.activeIcon {
         opacity: 1;
       }
