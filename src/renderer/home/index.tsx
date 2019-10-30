@@ -52,6 +52,7 @@ export const Home: React.FC<{}> = function () {
       <div className={styles.searchControls}>
         <InputGroup
           placeholder="Type to search…"
+          large={true}
           rightElement={maybeSpinner}
           value={query || ''}
           type="text"
