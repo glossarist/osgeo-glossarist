@@ -1,4 +1,4 @@
-import { debounce } from 'throttle-debounce';
+import { throttle } from 'throttle-debounce';
 import { ipcRenderer } from 'electron';
 
 import React, { useState, useEffect, useContext } from 'react';
@@ -17,6 +17,7 @@ export const Home: React.FC<{}> = function () {
   const [concepts, updateConcepts] = useState([] as Concept[]);
   const [total, updateTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [canMerge, setCanMerge] = useState(false);
   const [query, setQuery] = useState(undefined as undefined | string);
 
   async function reloadConcepts() {
@@ -27,9 +28,10 @@ export const Home: React.FC<{}> = function () {
     setLoading(false);
     updateConcepts(result.items);
     updateTotal(result.total);
+    setCanMerge(true);
   }
 
-  const reloadThrottled = debounce(500, reloadConcepts);
+  const reloadThrottled = throttle(500, reloadConcepts);
 
   useEffect(() => {
     reloadConcepts();
@@ -84,6 +86,7 @@ export const Home: React.FC<{}> = function () {
 
       <footer className={styles.actions}>
         <Button
+          disabled={!canMerge}
           large={true}
           intent="success"
           fill={true}
