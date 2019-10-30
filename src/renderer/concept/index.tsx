@@ -29,7 +29,23 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
   }
 
   async function handleSaveClick() {
-    await apiRequest<void>('concept', JSON.stringify({ id: id }), JSON.stringify({ newData: concept }));
+    if (concept) {
+      const newConcept = {
+        ...concept,
+        [lang.selected]: {
+          ...concept[lang.selected],
+          term: term,
+          definition: definition,
+          authoritative_source: { link: authSource },
+        },
+      } as ConceptModel;
+
+      if (lang.selected === lang.default) {
+        newConcept.term = term;
+      }
+
+      await apiRequest<void>('concept', JSON.stringify({ id: id }), JSON.stringify({ newData: newConcept }));
+    }
   }
 
   useEffect(() => {

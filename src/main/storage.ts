@@ -18,9 +18,10 @@ export class ConceptManager extends StoreManager<Concept> {
 
     const storeable = Object.assign({}, obj);
     storeable.termid = storeable.id;
-    delete storeable['id'];
+    delete storeable.id;
 
-    await storage.yaml.store(path.join(this.rootDir, `concept-${obj.id}.yaml`), obj);
+    const objPath = path.join(storage.workDir, this.rootDir, `concept-${obj.id}.yaml`);
+    await storage.yaml.store(objPath, storeable);
 
     if (updateIndex === true) {
       await this.updateIndexedItem(obj, storage);
