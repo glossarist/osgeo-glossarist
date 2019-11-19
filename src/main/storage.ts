@@ -8,6 +8,14 @@ import { Index } from 'sse/storage/query';
 import { Concept } from 'models/concept';
 
 
+// Must match what’s specified in renderer/index.tsx
+const SUPPORTED_LANGUAGES = [
+  'eng',
+  'zho',
+  'rus',
+]
+
+
 export class ConceptManager extends StoreManager<Concept> {
   constructor() {
     super('concepts');
@@ -37,7 +45,20 @@ export class ConceptManager extends StoreManager<Concept> {
   }
 
   public objectMatchesQuery(obj: Concept, query: string) {
-    return obj.term.trim().toLowerCase().indexOf(query.trim().toLowerCase()) >= 0;
+    const q = sanitize(query);
+
+    if (sanitize(obj.term).indexOf(q) >= 0) {
+      return true;
+    }
+
+    for (const lang of SUPPORTED_LANGUAGES) {
+      const term = obj[lang];
+      if (term && sanitize(term.term).indexOf(q) >= 0) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
@@ -70,4 +91,9 @@ export async function initStorage(workDir: string): Promise<Storage> {
   });
   await storage.loadWorkspace();
   return storage;
+}
+
+
+function sanitize(val: string): string {
+  return val.trim().toLowerCase();
 }
