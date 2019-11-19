@@ -1,6 +1,12 @@
 import { IndexableObject } from 'sse/storage/query';
 
 
+// export interface Concept extends IndexableObject {
+//   id: number,
+//   term: string,
+// }
+
+
 export interface LocalizedConcept extends IndexableObject {
   language_code: string,
 

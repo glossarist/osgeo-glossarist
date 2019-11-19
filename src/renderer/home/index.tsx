@@ -8,6 +8,8 @@ import { NonIdealState, Button, Spinner, Icon, InputGroup } from '@blueprintjs/c
 import { LangConfigContext } from 'sse/localizer/renderer';
 import { PaneHeader } from 'sse/renderer/widgets/pane-header';
 import { apiRequest } from 'sse/api/renderer';
+
+import { LangSelector } from 'renderer/lang';
 import { Concept } from 'models/concept';
 
 import styles from './styles.scss';
@@ -36,8 +38,10 @@ export const Home: React.FC<{}> = function () {
   useEffect(() => {
     reloadConcepts();
     ipcRenderer.once('app-loaded', reloadConcepts);
+    ipcRenderer.on('updated-concepts', reloadConcepts);
     return function cleanup() {
       ipcRenderer.removeListener('app-loaded', reloadConcepts);
+      ipcRenderer.removeListener('updated-concepts', reloadConcepts);
     };
   }, []);
 
@@ -49,7 +53,11 @@ export const Home: React.FC<{}> = function () {
 
   return (
     <div className={styles.homeBase}>
-      <PaneHeader align="right">OSGeo Concepts</PaneHeader>
+      <PaneHeader align="right">
+        OSGeo Concepts
+        &emsp;
+        <LangSelector />
+      </PaneHeader>
 
       <div className={styles.searchControls}>
         <InputGroup
@@ -100,30 +108,42 @@ export const Home: React.FC<{}> = function () {
 
 const ConceptItem: React.FC<{ concept: Concept }> = function ({ concept }) {
   const lang = useContext(LangConfigContext);
-  const localized = concept[lang.selected];
+  const term = concept[lang.selected];
 
-  const hasComments = (localized.comments || []).length > 0;
-  const hasNotes = (localized.notes || []).length > 0;
-  const hasExamples = (localized.examples || []).length > 0;
+  let hasComments, hasNotes, hasExamples: boolean;
+
+  if (term) {
+    hasComments = (term.comments || []).length > 0;
+    hasNotes = (term.notes || []).length > 0;
+    hasExamples = (term.examples || []).length > 0;
+  } else {
+    hasComments = false;
+    hasNotes = false;
+    hasExamples = false;
+  }
 
   return (
-    <li className={styles.conceptItem} onClick={() => ipcRenderer.sendSync('open-concept', `${concept.id}`)}>
+    <li className={styles.conceptItem} onClick={() => ipcRenderer.sendSync('open-concept', `${concept.id}`, lang.selected)}>
       <p className={styles.title}>
-        <a>{localized.term}</a>
+        <a>{(term || concept).term}</a>
       </p>
       <div className={styles.icons}>
-        <Icon icon="comment"
-          htmlTitle="Has comments"
-          className={hasComments ? styles.activeIcon : undefined}
-          intent={hasComments ? "primary" : undefined} />
-        <Icon icon="annotation"
-          htmlTitle="Has notes"
-          className={hasNotes ? styles.activeIcon : undefined}
-          intent={hasNotes ? "primary" : undefined} />
-        <Icon icon="citation"
-          htmlTitle="Has examples"
-          className={hasExamples ? styles.activeIcon : undefined}
-          intent={hasExamples ? "primary" : undefined} />
+        {term
+          ? <>
+              <Icon icon="comment"
+                htmlTitle={hasComments ? "Has comments" : undefined}
+                className={hasComments ? styles.activeIcon : undefined}
+                intent={hasComments ? "primary" : undefined} />
+              <Icon icon="annotation"
+                htmlTitle={hasNotes ? "Has notes" : undefined}
+                className={hasNotes ? styles.activeIcon : undefined}
+                intent={hasNotes ? "primary" : undefined} />
+              <Icon icon="citation"
+                htmlTitle={hasExamples ? "Has examples" : undefined}
+                className={hasExamples ? styles.activeIcon : undefined}
+                intent={hasExamples ? "primary" : undefined} />
+            </>
+          : <><span>missing term</span> <Icon icon="warning-sign" /></>}
       </div>
     </li>
   );

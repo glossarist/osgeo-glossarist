@@ -27,6 +27,8 @@ const searchParams = new URLSearchParams(window.location.search);
 const App: React.FC<{}> = function () {
   let component: JSX.Element;
 
+  const selectedLang = searchParams.get('lang') || undefined;
+
   if (searchParams.get('c') === 'home') { 
     component = <Home />;
 
@@ -48,7 +50,7 @@ const App: React.FC<{}> = function () {
   const [langConfig, setLangConfig] = useState({
     available: { eng: 'English', zho: 'Chinese', rus: 'Russian' },
     default: 'eng',
-    selected: 'eng',
+    selected: selectedLang || 'eng',
     select: (langId: string) => {
       setLangConfig(langConfig => Object.assign({}, langConfig, { selected: langId }));
     },

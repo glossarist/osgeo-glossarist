@@ -18,7 +18,6 @@ const isMacOS = process.platform === 'darwin';
 
 
 const APP_TITLE = "OSGeo Glossary Manager";
-//const APP_HELP_ROOT = "https://www.ituob.org/_app_help/";
 
 const USER_DATA_DIR = app.getPath('userData');
 const WORK_DIR = path.join(USER_DATA_DIR, 'osgeo-glossarist');
@@ -85,17 +84,21 @@ then(results => {
       };
     });
 
+    makeEndpoint<void>('updated-concepts', async () => {}, async () => {
+    });
+
     makeEndpoint<Concept>('concept', async ({ id }: { id: string }) => {
       return storage.workspace.concepts[id] as Concept;
     }, async ({ newData }) => {
       storage.workspace.concepts[newData.id] = newData;
       await storage.storeWorkspace();
+      await messageHome('updated-concepts');
     });
 
-    makeWindowEndpoint('concept', (id: string) => ({
+    makeWindowEndpoint('concept', (id: string, lang?: string) => ({
       component: 'concept',
       title: `Concept ${id}`,
-      componentParams: `id=${id}`,
+      componentParams: `id=${id}&lang=${lang || ''}`,
       frameless: true,
       dimensions: { width: 800, height: 600, minWidth: 700, minHeight: 500 },
     }));
@@ -110,10 +113,10 @@ then(results => {
 });
 
 
-function messageHome(eventName: string) {
+async function messageHome(eventName: string) {
   const homeWindow = getWindowByTitle(APP_TITLE);
   if (homeWindow !== undefined) {
-    homeWindow.webContents.send(eventName);
+    await homeWindow.webContents.send(eventName);
   }
 }
 

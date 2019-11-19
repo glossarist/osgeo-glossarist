@@ -1,24 +1,27 @@
+import { remote } from 'electron';
+
 import React, { useContext, useState, useEffect } from 'react';
 
-import { H2, Tooltip, Button, EditableText } from '@blueprintjs/core';
+import { H2, Tooltip, Button, EditableText, Position } from '@blueprintjs/core';
 
 import { LangConfigContext } from 'sse/localizer/renderer';
 import { PaneHeader } from 'sse/renderer/widgets/pane-header';
 import { apiRequest } from 'sse/api/renderer';
 
+import { LangSelector } from 'renderer/lang';
 import { Concept as ConceptModel } from 'models/concept';
 
 import styles from './styles.scss';
 
 
-export const Concept: React.FC<{ id: string }> = function ({ id }) {
+export const Concept: React.FC<{ id: string, lang?: string }> = function ({ id }) {
   const [concept, updateConcept] = useState(undefined as ConceptModel | undefined);
   const [loading, setLoading] = useState(true);
   const [dirty, setDirty] = useState(false);
 
-  const [term, updateTerm] = useState('');
-  const [definition, updateDefinition] = useState('');
-  const [authSource, updateAuthSource] = useState('');
+  const [term, updateTerm] = useState('' as string);
+  const [definition, updateDefinition] = useState('' as string);
+  const [authSource, updateAuthSource] = useState('' as string);
 
   const lang = useContext(LangConfigContext);
 
@@ -51,6 +54,8 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
 
       setDirty(false);
       setLoading(false);
+
+      remote.getCurrentWindow().close();
     }
   }
 
@@ -59,16 +64,23 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
   }, []);
 
   useEffect(() => {
-    if (concept && concept[lang.selected]) {
-      updateTerm(concept[lang.selected].term);
-      updateDefinition(concept[lang.selected].definition);
-      updateAuthSource(concept[lang.selected].authoritative_source.link);
+    if (concept) {
+      const term = concept[lang.selected] || {};
+      updateTerm(term.term || '');
+      updateDefinition(term.definition || '');
+      updateAuthSource((term.authoritative_source || {}).link || '');
     }
-  }, [concept]);
+  }, [concept, lang.selected]);
 
   return (
     <div className={styles.conceptBase}>
-      <PaneHeader align="right">Concept&nbsp;<Tooltip content="Concept IDs are set internally and cannot be changed"><span className={styles.conceptIdHighlight}>{id}</span></Tooltip></PaneHeader>
+      <PaneHeader align="right">
+        Concept
+        &ensp;
+        <Tooltip position={Position.RIGHT_TOP} content="Concept IDs are set internally and cannot be changed"><span className={styles.conceptIdHighlight}>{id}</span></Tooltip>
+        &emsp;
+        <LangSelector />
+      </PaneHeader>
 
       <H2 className={styles.conceptHeader}>
         <EditableText
@@ -84,7 +96,7 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
           intent={authSource.trim() === '' ? "danger" : undefined}
           onChange={(val: string) => { setDirty(true); updateAuthSource(val); }}
           value={authSource}/>
-        <Tooltip content="Open authoritative source in a new window">
+        <Tooltip position={Position.RIGHT_TOP} content="Open authoritative source in a new window">
           <Button
             minimal={true}
             small={true}
@@ -109,7 +121,7 @@ export const Concept: React.FC<{ id: string }> = function ({ id }) {
           minimal={false}
           intent="primary"
           onClick={handleSaveClick}
-          icon="floppy-disk">Save</Button>
+          icon="tick">Save and close</Button>
       </footer>
     </div>
   );
