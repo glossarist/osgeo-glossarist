@@ -150,7 +150,7 @@ export const Concept: React.FC<{ id: string, lang?: string }> = function ({ id }
 
       <footer className={styles.actions}>
         <Button
-          disabled={loading || !dirty}
+          disabled={loading || !dirty || term.trim() === ''}
           large={true}
           minimal={false}
           intent="primary"
