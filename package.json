@@ -4,6 +4,8 @@
   "description": "Cross-platform graphical terminal for collaborative editing of OSGeo glossary",
   "main": "index.js",
   "repository": "git@github.com:geolexica/osgeo-glossarist.git",
+  "bugs": "https://github.com/geolexica/osgeo-glossarist/issues",
+  "author": "Ribose Inc. <open.source@ribose.com>",
   "license": "MIT",
   "electronWebpack": {
     "staticSourceDirectory": "src/static",
@@ -14,14 +16,78 @@
       "webpackConfig": "renderer.webpack.js"
     }
   },
-  "build": {
-    "productName": "OSGeo Glossarist"
-  },
   "scripts": {
     "dev": "electron-webpack dev",
     "compile": "electron-webpack",
-    "dist": "yarn compile && electron-builder -ml",
-    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
+    "dist": "cross-env DEBUG=electron-builder electron-builder",
+    "dist:win": "electron-builder -w",
+    "dist:mac": "electron-builder -m",
+    "pack": "electron-builder --dir",
+    "release": "electron-builder --publish always",
+    "cdist": "yarn compile && electron-builder -mlw",
+    "cdist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
+  },
+  "build": {
+    "productName": "OSGeo Glossarist",
+    "appId": "org.geolexica.osgeo",
+    "afterSign": "./scripts/hooks/after-sign.js",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "target": "dmg",
+      "gatekeeperAssess": false,
+      "hardenedRuntime": true,
+      "entitlements": "assets/mac/entitlements.mac.inherit.plist",
+      "entitlementsInherit": "assets/mac/entitlements.mac.inherit.plist"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 440,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "artifactName": "geolexica-osgeo-${version}.${ext}"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable"
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "runAfterFinish": true,
+      "installerIcon": "build/icon.ico",
+      "artifactName": "electron-gha-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "geolexica-osgeo.exe"
+    },
+    "appx": {
+      "backgroundColor": "#464646",
+      "publisherDisplayName": "ituob",
+      "artifactName": "geolexica-osgeo-${version}.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "releaseType": "release"
+      }
+    ]
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
@@ -29,8 +95,10 @@
     "@types/react": "^16.8.6",
     "@types/react-dom": "^16.8.6",
     "@types/throttle-debounce": "^2.1.0",
+    "cross-env": "^6.0.3",
     "electron": "^7.0.0",
     "electron-builder": "^21.2.0",
+    "electron-notarize": "^0.2.1",
     "electron-react-devtools": "^0.5.3",
     "electron-webpack": "^2.7.4",
     "electron-webpack-ts": "^3.2.0",
